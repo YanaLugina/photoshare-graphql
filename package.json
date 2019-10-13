@@ -1,0 +1,29 @@
+{
+  "name": "photo-share-api",
+  "version": "1.0.0",
+  "description": "Testing GraphQL in simple pet-progect",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -e js,json,graphql"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YanaLugina/photoshare-graphql.git"
+  },
+  "keywords": [
+    "graphql",
+    "apollo-server"
+  ],
+  "author": "YanaLugina",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/YanaLugina/photoshare-graphql/issues"
+  },
+  "homepage": "https://github.com/YanaLugina/photoshare-graphql#readme",
+  "dependencies": {
+    "apollo-server": "^2.9.6",
+    "graphql": "^14.5.8",
+    "nodemon": "^1.19.3"
+  }
+}
