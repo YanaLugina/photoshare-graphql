@@ -29,11 +29,11 @@ const typeDefs = `
   
 `;
 
+let _id = 5;
 
 let photos = [];
 
-let _id = 2;
-
+// распознователи
 const resolvers = {
     Query: {
         totalPhotos: () => photos.length,
@@ -48,6 +48,9 @@ const resolvers = {
             photos.push(newPhoto);
             return newPhoto;
         }
+    },
+    Photo: {
+        url: parent => `http://site.com/img/${parent.id}.img`
     }
 
 };
