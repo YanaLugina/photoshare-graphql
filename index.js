@@ -1,6 +1,18 @@
 const { ApolloServer } = require('apollo-server');
 
 const typeDefs = `
+
+  """
+  Тип перечисления PhotoCategory
+  """
+  enum PhotoCategory {
+    SELFIE
+    PORTRAIT
+    ACTION
+    LANDSCAPE
+    GRAPHIC
+  }
+
   """
   тип Photo
   """
@@ -9,6 +21,16 @@ const typeDefs = `
     name: String!
     url: String!
     description: String
+    category: PhotoCategory!
+  }
+  
+  """
+  Тип ввода для мутации postPhoto
+  """
+  input PostPhotoInput {
+    name: String!
+    description: String
+    category: PhotoCategory=PORTRAIT
   }
 
   """
@@ -23,7 +45,7 @@ const typeDefs = `
    Возвращаем недавно опубликованную фотографию из мутации
   """
   type Mutation {
-    postPhoto(name: String! description: String): Photo!
+    postPhoto(input: PostPhotoInput): Photo!
   }
   
   
@@ -43,12 +65,13 @@ const resolvers = {
         postPhoto(parent, args) {
             let newPhoto = {
                 id: _id++,
-                ...args
+                ...args.input
             };
             photos.push(newPhoto);
             return newPhoto;
         }
     },
+    //тривиальный распознователь
     Photo: {
         url: parent => `http://site.com/img/${parent.id}.img`
     }
