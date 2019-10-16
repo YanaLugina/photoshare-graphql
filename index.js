@@ -12,6 +12,16 @@ const typeDefs = `
     LANDSCAPE
     GRAPHIC
   }
+  
+  """
+  тип User
+  """
+  type User {
+    githubLogin: ID!
+    name: String!
+    avatar: String
+    postedPhotos: [Photo!]!
+  }
 
   """
   тип Photo
@@ -22,6 +32,7 @@ const typeDefs = `
     url: String!
     description: String
     category: PhotoCategory!
+    postedBy: User!
   }
   
   """
