@@ -64,7 +64,34 @@ const typeDefs = `
 
 let _id = 5;
 
-let photos = [];
+const users = [
+    { "githubLogin": "mHattrup", "name": "Mike Huttrup" },
+    { "githubLogin": "sSchmidt", "name": "Glen Plake" },
+    { "githubLogin": "gPlake", "name": "Scot Schmidt" }
+];
+
+let photos = [
+    {
+        "id": "1",
+        "name": "Dropping the Heart Chute",
+        "description": "the heart chute is one of my favorite chutes",
+        "category": "ACTION",
+        "githubUser": "gPlake"
+    },
+    {
+        "id": "2",
+        "name": "Enjoying the sunshine",
+        "category": "SELFIE",
+        "githubUser": "sSchmidt"
+    },
+    {
+        "id": "3",
+        "name": "Gunbarrel 25",
+        "description": "25 laps on gunbarrel today",
+        "category": "LANDSCAPE",
+        "githubUser": "sSchemidt"
+    }
+];
 
 // распознователи
 const resolvers = {
@@ -84,7 +111,15 @@ const resolvers = {
     },
     //тривиальный распознователь
     Photo: {
-        url: parent => `http://site.com/img/${parent.id}.img`
+        url: parent => `http://site.com/img/${parent.id}.jpg`,
+        postedBy: parent => {
+            return users.find(u => u.githubLogin === parent.githubUser)
+        }
+    },
+    User: {
+        postedPhotos: parent => {
+            return photos.filter(p => p.githubUser === parent.githubLogin)
+        }
     }
 
 };
