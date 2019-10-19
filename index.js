@@ -1,75 +1,21 @@
-const { ApolloServer } = require('apollo-server');
-const { GraphQLScalarType } = require('graphql');
+const { ApolloServer } = require('apollo-server-express');
+const express = require('express');
+const expressPlayground = require('graphql-playground-middleware-express').default;
+const { readFileSync } = require('fs');
+const typeDefs = readFileSync('./typeDefs.graphql', 'UTF-8');
+const resolvers = require('./resolvers');
 
-const typeDefs = `
+const app = express();
 
-  """
-  Date-time
-  """
-  scalar DateTime
-  
-  """
-  Тип перечисления PhotoCategory
-  """
-  enum PhotoCategory {
-    SELFIE
-    PORTRAIT
-    ACTION
-    LANDSCAPE
-    GRAPHIC
-  }
-  
-  """
-  тип User
-  """
-  type User {
-    githubLogin: ID!
-    name: String!
-    avatar: String
-    postedPhotos: [Photo!]!
-    inPhotos: [Photo!]!
-  }
+const server = new ApolloServer({ typeDefs, resolvers });
 
-  """
-  тип Photo
-  """
-  type Photo {
-    id: ID!
-    name: String!
-    url: String!
-    description: String
-    category: PhotoCategory!
-    postedBy: User!
-    taggedUsers: [User!]!
-    created: DateTime!
-  }
-  
-  """
-  Тип ввода для мутации postPhoto
-  """
-  input PostPhotoInput {
-    name: String!
-    description: String
-    category: PhotoCategory=PORTRAIT
-  }
+server.applyMiddleware({ app });
 
-  """
-   Возвращаем Photo по запросу allPhotos
-  """
-  type Query {
-    totalPhotos: Int!
-    allPhotos(after: DateTime): [Photo!]!
-  }
-  
-  """
-   Возвращаем недавно опубликованную фотографию из мутации
-  """
-  type Mutation {
-    postPhoto(input: PostPhotoInput): Photo!
-  }
-  
-  
-`;
+app.get('/', (req, res) => res.end('Welcome to the PhotoShare API'));
+
+app.get('/playground', expressPlayground({ endpoint: '/graphql' }));
+
+
 
 let _id = 5;
 
@@ -113,71 +59,7 @@ let photos = [
 ];
 
 
-// распознователи
-const resolvers = {
-    Query: {
-        totalPhotos: () => photos.length,
-        allPhotos: () => photos
-    },
-    Mutation: {
-        postPhoto(parent, args) {
-            let newPhoto = {
-                id: _id++,
-                ...args.input,
-                created: new Date()
-            };
-            photos.push(newPhoto);
-            return newPhoto;
-        }
-    },
-    //тривиальный распознователь
-    Photo: {
-        url: parent => `http://site.com/img/${parent.id}.jpg`,
-        postedBy: parent => {
-            return users.find(u => u.githubLogin === parent.githubUser)
-        },
-        taggedUsers: parent => tags
 
-        //Возвращаем массив тегов, которые содержат только текущие фотографии
-            .filter(tag => tag.photoID === parent.id)
-
-            //Преобразует массив тегов в массив значений userID
-            .map(tag => tag.userID)
-
-            //Преобразует массив значений userID в массив объектов пользователей
-            .map(userID => users.find(u => u.githubLogin === userID))
-    },
-    User: {
-        postedPhotos: parent => {
-            return photos.filter(p => p.githubUser === parent.githubLogin)
-        },
-        inPhotos: parent => tags
-
-        //Возвращаем массив тегов, которые содержат только текущего пользователя
-            .filter(tag => tag.userID === parent.id)
-
-            //Преобразует массив тегов в массив значений photoID
-            .map(tag => tag.photoID)
-
-            //Преобразует массив значений photoID в массив объектов фотографий
-            .map(photoID => photos.find(p => p.id === photoID))
-    },
-    DateTime: new GraphQLScalarType({
-        name: 'DateTime',
-        description: 'A valid date time value.',
-        parseValue: value => new Date(value),
-        serialize: value => new Date(value).toISOString(),
-        parseLiteral: ast => ast.value
-    })
-
-};
-
-
-const server = new ApolloServer({
-    typeDefs,
-    resolvers
+app.listen({ port: 3000 }, () => {
+    console.log(`GraphQL Server @ http://localhost:4000${server.graphqlPath}`)
 });
-
-server
-    .listen()
-    .then(({url}) => console.log(`GraphQL Server running on ${url}`));
