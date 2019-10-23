@@ -13,14 +13,16 @@ async function start() {
     try {
         const app = express();
         const MONGO_DB = process.env.DB_HOST;
-
         const client = await MongoClient.connect(
             MONGO_DB,
             {useNewUrlParser: true}
         );
-
         const db = client.db();
         const context = {db};
+
+
+
+
 
         const server = new ApolloServer({typeDefs, resolvers, context});
 

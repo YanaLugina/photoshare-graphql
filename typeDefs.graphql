@@ -40,6 +40,14 @@ type Photo {
 }
 
 """
+тип AuthPayload
+"""
+type AuthPayload {
+    token: String!
+    user: User!
+}
+
+"""
 Тип ввода для мутации postPhoto
 """
 input PostPhotoInput {
@@ -63,4 +71,5 @@ type Query {
 """
 type Mutation {
     postPhoto(input: PostPhotoInput): Photo!
+    githubAuth(code: String!): AuthPayload!
 }
