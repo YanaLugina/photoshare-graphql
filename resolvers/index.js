@@ -1,4 +1,7 @@
-'use strict';
+const clientID = '7b8d6537da1af4e97d92';
+const clientSecret = '3ad9329e5240066b24d1b60f30a288f896c81504';
+
+// code= bd8f57115e24282d5043
 
 /**
  * resolvers for graphql
@@ -25,6 +28,41 @@ const resolvers = {
             return db.collection('users')
                 .find()
                 .toArray();
+        }
+    },
+
+    Mutation: {
+        async githubAuth(parent, {code}, {db}) {
+            //получаем данные от Github
+            let {
+                message,
+                access_token,
+                avatar_url,
+                login,
+                name
+            } = await authorizeWithGithub({
+                client_id: '696aa1d9f46f55b9c43d',
+                client_secret: 'f1528109a3980b3095db55e58f97b528ade14ce0',
+                code
+            });
+            //если что-то пошло не так
+            if (message) {
+                throw new Error(message);
+            }
+            //пакуем результат в один пакет
+            let latestUserInfo = {
+                name,
+                githubLogin: login,
+                githubToken: access_token,
+                avatar: avatar_url
+            };
+            //Добавляем новую информацию или обновляем запись
+            const {ops: [user]} = await db
+                .collection('users')
+                .replaceOne({githubLogin: login}, latestUserInfo, {upsert: true});
+            //Возвращаем данные пользователя и его логин
+
+            return {user, token: access_token};
         }
     }
     /*
