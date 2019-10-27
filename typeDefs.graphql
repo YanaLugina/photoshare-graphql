@@ -62,10 +62,11 @@ input PostPhotoInput {
 type Query {
     totalPhotos: Int!
     allPhotos(after: DateTime): [Photo!]!
+    Photo(id: ID!): Photo
     totalUsers: Int!
     allUsers:  [User!]!
-    githubLoginUrl: String!
     User(login: ID!): User
+    githubLoginUrl: String!
     me: User
 }
 
@@ -73,6 +74,8 @@ type Query {
 Возвращаем недавно опубликованную фотографию из мутации
 """
 type Mutation {
-    postPhoto(input: PostPhotoInput): Photo!
+    postPhoto(input: PostPhotoInput!): Photo!
     githubAuth(code: String!): AuthPayload!
+    addFakeUsers(count: Int = 1): [User!]!
+    fakeUserAuth(githubLogin: ID!): AuthPayload!
 }
