@@ -1,7 +1,7 @@
 const express = require('express');
-const {ApolloServer} = require('apollo-server-express');
-const {MongoClient} = require('mongodb');
-const {readFileSync} = require('fs');
+const { ApolloServer } = require('apollo-server-express');
+const { MongoClient } = require('mongodb');
+const { readFileSync } = require('fs');
 const expressPlayground = require('graphql-playground-middleware-express').default;
 const resolvers = require('./resolvers/index');
 require('dotenv').config();
@@ -13,12 +13,22 @@ async function start() {
         const app = express();
         const MONGO_DB = process.env.DB_HOST;
 
-        const client = await MongoClient.connect(
-            MONGO_DB,
-            {useNewUrlParser: true, useUnifiedTopology: true}
-        );
-        const db = client.db();
+        let db;
 
+        try {
+                const client = await MongoClient.connect(
+                    MONGO_DB,
+                    {useNewUrlParser: true, useUnifiedTopology: true}
+                );
+                db = client.db();
+        } catch {
+                console.log(
+                    `Mongo DB Host not found!
+                     please add DB_HOST environment variable to .env file
+                     exiting...`);
+
+                process.exit(1)
+        }
         const server = new ApolloServer({
                 typeDefs,
                 resolvers,
