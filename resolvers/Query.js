@@ -28,7 +28,7 @@ module.exports = {
         return `https://github.com/login/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=user`;
     },
 
-    me: (parent, args, { currentUser }) => currentUser,
+    me: (parent, args, { currentUser }) => currentUser || null,
 
     User: (parent, args, { db }) => {
         return  db.collection('users')
